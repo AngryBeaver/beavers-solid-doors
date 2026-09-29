@@ -1,0 +1,4 @@
+/* The solid-door fieldset in the wall sheet: the range picker takes the whole row like Foundry's own. */
+.wall-config fieldset.beavers-solid-doors range-picker {
+  flex: 1;
+}

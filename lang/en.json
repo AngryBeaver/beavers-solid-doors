@@ -1,0 +1,28 @@
+{
+  "BEAVERS_SOLID_DOORS": {
+    "config": {
+      "legend": "Solid door",
+      "swing": {
+        "hint": "Open, the door turns around its hinge (the wall's start point, both ends for a double door) and blocks where it stands, the doorway is free. Open Direction decides the side. Drag the door icon to open it only partly.",
+        "max": "Opens up to (degrees)",
+        "maxHint": "How far the door turns at most."
+      },
+      "swivel": {
+        "hint": "Open, the door turns around its middle (each half around its own middle for a double door) and blocks where it stands, the doorway beside it is free. Open Direction decides the way it turns. Drag the door icon to open it only partly.",
+        "max": "Opens up to (degrees)",
+        "maxHint": "How far the door turns at most, up to 90."
+      },
+      "slide": {
+        "hint": "Open, the door slides along its wall (towards the start point, or the end point with the reverse Open Direction; a double door opens to both ends) and blocks where it stands, the part of the doorway it left is free. Drag the door icon to open it only partly.",
+        "max": "Opens up to (% of its length)",
+        "maxHint": "How far the door slides at most. 100 frees the whole doorway."
+      }
+    },
+    "error": {
+      "locked": "This door is locked.",
+      "not-allowed": "You may not open or close doors.",
+      "no-door": "This is no solid door.",
+      "gm-error": "The gamemaster's client refused to move this door."
+    }
+  }
+}

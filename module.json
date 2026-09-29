@@ -1,0 +1,28 @@
+{
+  "title": "{{title}}",
+  "description": "{{description}}",
+  "id": "{{name}}",
+  "version": "{{version}}",
+  "authors": [
+    {
+      "name": "angryBeaver",
+      "url": "https://github.com/angrybeaver"
+    }
+  ],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
+    }
+  ],
+  "esmodules": "{{sources}}",
+  "styles": "{{css}}",
+  "url": "https://github.com/AngryBeaver/beavers-solid-doors",
+  "manifest": "https://github.com/AngryBeaver/beavers-solid-doors/releases/latest/download/module.json",
+  "download": "https://github.com/AngryBeaver/beavers-solid-doors/releases/latest/download/beavers-solid-doors.zip",
+  "compatibility": {
+    "minimum": "14",
+    "verified": "14"
+  }
+}
