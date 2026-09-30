@@ -3,10 +3,12 @@ import {
   amountToward,
   clampAmount,
   kindOf,
+  iconPoint,
   latestAmount,
   leafSegments,
   readConfig,
   rotate,
+  sightPoints,
   type Kind,
 } from "../src/core/door";
 
@@ -213,5 +215,39 @@ describe("latestAmount", () => {
   });
   it("ignores broken user entries", () => {
     expect(latestAmount({ amount: 40, time: 100 }, [null, { amount: "x", time: 500 }, { amount: 70 }])).toBe(40);
+  });
+});
+
+describe("sightPoints", () => {
+  it("lies along the leaf, just off both sides", () => {
+    expect(sightPoints([0, 0, 100, 0], 3, [0.5])).toEqual([at(50, 3), at(50, -3)]);
+    expect(sightPoints([0, 0, 0, 100], 3, [0.25, 0.75])).toEqual([at(-3, 25), at(3, 25), at(-3, 75), at(3, 75)]);
+  });
+  it("covers the whole leaf by default, up to near its free end", () => {
+    const points = sightPoints([0, 0, 100, 0]);
+    expect(points).toHaveLength(8);
+    expect(Math.max(...points.map((p) => p.x))).toBe(95);
+  });
+  it("gives nothing for a leaf without length", () => {
+    expect(sightPoints([5, 5, 5, 5])).toEqual([]);
+  });
+});
+
+describe("iconPoint", () => {
+  it("stays in the middle of the doorway when closed and for double doors", () => {
+    expect(iconPoint(C, door("swing"), 90, false)).toEqual(at(50, 0));
+    expect(iconPoint(C, door("swing", 1, 90, true), 90, true)).toEqual(at(50, 0));
+    expect(iconPoint(C, door("slide", 1, 100, true), 100, true)).toEqual(at(50, 0));
+  });
+  it("rides on the middle of an open turning door", () => {
+    expect(iconPoint(C, door("swing"), 90, true)).toEqual(at(0, 50));
+    expect(iconPoint(C, door("swing", -1), 90, true)).toEqual(at(0, -50));
+    expect(iconPoint(C, door("swivel"), 90, true)).toEqual(at(50, 0));
+  });
+  it("follows a sliding door up to the edge of the doorway, then stays there", () => {
+    expect(iconPoint(C, door("slide", 1, 100), 30, true)).toEqual(at(20, 0));
+    expect(iconPoint(C, door("slide", 1, 100), 50, true)).toEqual(at(0, 0));
+    expect(iconPoint(C, door("slide", 1, 100), 100, true)).toEqual(at(0, 0));
+    expect(iconPoint(C, door("slide", -1, 100), 80, true)).toEqual(at(100, 0));
   });
 });

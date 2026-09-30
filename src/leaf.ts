@@ -119,6 +119,8 @@ export function syncLeaf(wall: any, deleted = false) {
     }
   }
   drawLeaf(wall);
+  // The icon rides on an open single door (DoorControl#reposition is patched in interaction.ts)
+  wall.object?.doorControl?.reposition();
 }
 
 /** Every change to a wall's edge goes through WallDocument#initializeEdge: scene setup, create, update, delete. */

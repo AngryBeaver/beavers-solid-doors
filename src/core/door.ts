@@ -180,6 +180,52 @@ export function leafSegments(c: Segment, config: Omit<DoorConfig, "max" | "amoun
 }
 
 /**
+ * Where the door icon belongs. Closed, and for double doors (whose halves stand apart, leaving the doorway between
+ * them free), in the middle of the doorway as Foundry has it. An open single door carries it along on its middle; a
+ * sliding door only until its middle reaches the edge of the doorway (at 50 %), then the icon stays at that edge, so it
+ * never ends up over the wall the door slides into.
+ */
+export function iconPoint(
+  c: Segment,
+  config: Omit<DoorConfig, "max" | "amount">,
+  amount: number,
+  open: boolean,
+): Point {
+  const center = midpoint({ x: c[0], y: c[1] }, { x: c[2], y: c[3] });
+  if (!open || config.double) return center;
+  if (config.kind === "slide") {
+    const d = slideOffset(partsOf(c, false)[0], config.direction, Math.min(amount, 50));
+    return { x: center.x + d.x, y: center.y + d.y };
+  }
+  const [x0, y0, x1, y1] = leafSegments(c, config, amount)[0];
+  return midpoint({ x: x0, y: y0 }, { x: x1, y: y1 });
+}
+
+/**
+ * Points to test whether a token can see a leaf: along it, just off both of its sides (the leaf itself blocks sight,
+ * so a point on it would be hidden from both sides). Like Foundry's test for the closed door, which uses its midpoint
+ * only, but spread along the leaf so seeing any part of the open door counts.
+ */
+export function sightPoints(segment: Segment, offset = 3, along: readonly number[] = [0.25, 0.5, 0.75, 0.95]): Point[] {
+  const [x0, y0, x1, y1] = segment;
+  const dx = x1 - x0;
+  const dy = y1 - y0;
+  const length = Math.hypot(dx, dy);
+  if (!length) return [];
+  // Perpendicular to the leaf, `offset` long
+  const nx = (-dy / length) * offset;
+  const ny = (dx / length) * offset;
+  return along.flatMap((t) => {
+    const x = x0 + dx * t;
+    const y = y0 + dy * t;
+    return [
+      { x: x + nx, y: y + ny },
+      { x: x - nx, y: y - ny },
+    ];
+  });
+}
+
+/**
  * The opening in degrees that turns `from` (seen from `pivot`) towards `pointer`, limited to 0..max. `sign` is the
  * way the part turns when opening. The raw angle repeats every `period` degrees (360, or 180 for a swivel where both
  * halves look alike); near the wrap it may come out on the wrong side, so every repeat is tried and the one that

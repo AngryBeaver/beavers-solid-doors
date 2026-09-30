@@ -33,6 +33,10 @@ simply free.
   on the wall. Without a GM online the player stores it on their own user and every client uses the newest one; the
   next GM to log in moves these onto the walls.
 - The GM sees the open door's wall on the Walls layer, drawn like an open door (green) where the door stands.
+- A player sees the door icon when their token sees the doorway (as in Foundry) or any part of the open door, so an
+  open door never hides its own icon from a token trapped behind it.
+- The icon rides on an open single door: on its middle when it turns; when it slides, along with it up to the edge
+  of the doorway. Double doors keep it in the doorway between their halves. Works with or without a GM.
 - A door without a texture still works, it just has no picture.
 - The leaf is not tested against other walls, a door can swing through a wall.
 

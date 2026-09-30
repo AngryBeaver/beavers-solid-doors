@@ -1,10 +1,12 @@
 import {
   amountToward,
   CLOSE_BELOW,
+  iconPoint,
   leafSegments,
   midpoint,
   MODULE_ID,
   partsOf,
+  sightPoints,
   turnOf,
   type DoorConfig,
   type Point,
@@ -109,16 +111,29 @@ function warn(error: string) {
   else ui.notifications.warn(`BEAVERS_SOLID_DOORS.error.${error}`, { localize: true });
 }
 
+/** Put the icon (40 × 40 × uiScale, positioned by its corner like Foundry does) centred on `point`. */
+function placeIcon(control: any, point: Point) {
+  const half = 20 * canvas.dimensions.uiScale;
+  control.position.set(point.x - half, point.y - half);
+}
+
+/** Back to what the documents say: the picture, and the icon (DoorControl#reposition, patched below). */
+function resetDrag(wall: any) {
+  resetPicture(wall);
+  wall.object?.doorControl?.reposition();
+}
+
 async function settle(wall: any, request: Promise<DoorOutcome>) {
   const dsBefore = wall.ds;
   const outcome = await request;
   if (outcome.error) {
-    resetPicture(wall);
+    resetDrag(wall);
     warn(outcome.error);
     return;
   }
   // A changed ds animates by itself. Otherwise move the picture from wherever the drag left it to the stored amount.
   if (wall.ds === dsBefore) moveToAmount(wall);
+  wall.object?.doorControl?.reposition();
 }
 
 /** Press on the door icon of a solid door: wait whether this becomes a click or a drag. */
@@ -145,6 +160,7 @@ function startGesture(control: any, event: any, config: DoorConfig) {
     amount = amountToward(wall.c, config, pointer, grab);
     previewAmount(wall, amount);
     preview!.draw(amount);
+    placeIcon(control, iconPoint(wall.c, config, amount, true));
   };
 
   const finish = (e: PointerEvent) => {
@@ -153,7 +169,7 @@ function startGesture(control: any, event: any, config: DoorConfig) {
     window.removeEventListener("pointercancel", finish);
     preview?.destroy();
     if (e.type === "pointercancel") {
-      if (dragging) resetPicture(wall);
+      if (dragging) resetDrag(wall);
       return;
     }
     if (!dragging) void settle(wall, open ? requestDoor(wall, false) : requestDoor(wall, true, config.max));
@@ -167,11 +183,67 @@ function startGesture(control: any, event: any, config: DoorConfig) {
 }
 
 /**
+ * Foundry shows a door icon only when a token sees the closed door's middle. An open solid door can hide exactly that
+ * from a token behind it, which would leave the token trapped without a way to close the door. So the icon also shows
+ * when the token sees any part of the open leaf. Foundry re-checks this whenever vision refreshes, which a moved leaf
+ * triggers.
+ */
+function patchIsVisible(proto: any) {
+  const original = Object.getOwnPropertyDescriptor(proto, "isVisible")?.get;
+  if (!original) {
+    console.warn(`${MODULE_ID} | DoorControl#isVisible not found, door icons only show when the doorway is seen`);
+    return;
+  }
+  Object.defineProperty(proto, "isVisible", {
+    configurable: true,
+    get(this: any) {
+      if (original.call(this)) return true;
+      try {
+        const wall = this.wall?.document;
+        const config = solidConfig(wall);
+        if (!config || wall.ds !== CONST.WALL_DOOR_STATES.OPEN) return false;
+        const points = leafSegments(wall.c, config, config.amount).flatMap((segment) => sightPoints(segment));
+        return points.length > 0 && canvas.visibility.testVisibility(points, { object: this, tolerance: 0 });
+      } catch (e) {
+        console.error(`${MODULE_ID} | could not test whether door ${this.wall?.id} is seen`, e);
+        return false;
+      }
+    },
+  });
+}
+
+/**
+ * Foundry puts the icon in the middle of the doorway. An open single solid door carries it along (see iconPoint).
+ * Foundry's own placement runs first, so if this ever fails the icon simply stays in the doorway.
+ */
+function patchReposition(proto: any) {
+  const original = proto.reposition;
+  if (typeof original !== "function") {
+    console.warn(`${MODULE_ID} | DoorControl#reposition not found, door icons stay in the doorway`);
+    return;
+  }
+  proto.reposition = function (this: any, ...args: unknown[]) {
+    const result = original.apply(this, args);
+    try {
+      const wall = this.wall?.document;
+      const config = solidConfig(wall);
+      const open = wall?.ds === CONST.WALL_DOOR_STATES.OPEN;
+      if (config && open && !config.double) placeIcon(this, iconPoint(wall.c, config, config.amount, true));
+    } catch (e) {
+      console.error(`${MODULE_ID} | could not move the icon of door ${this.wall?.id}`, e);
+    }
+    return result;
+  };
+}
+
+/**
  * Replace the left click of the door icon for solid doors. The icon binds `this._onMouseDown` each time it is drawn,
  * so patching the prototype reaches every icon, also those drawn before.
  */
 export function patchDoorControl() {
   const proto = foundry.canvas.containers.DoorControl.prototype;
+  patchIsVisible(proto);
+  patchReposition(proto);
   const original = proto._onMouseDown;
   proto._onMouseDown = function (this: any, event: any) {
     const wall = this.wall?.document;
