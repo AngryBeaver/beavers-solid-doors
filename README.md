@@ -66,3 +66,10 @@ pnpm test
 pnpm build      # dist/
 pnpm devbuild   # into the Foundry data folder from package.json "devDir"
 ```
+
+## Releasing
+
+Commit to `main` with a message starting with `release v<version>`, e.g. `release v0.2.0`, and push. GitHub Actions
+(`.github/workflows/release.yml`) then typechecks, tests, builds the module as that version and publishes the GitHub
+release `v0.2.0` with `beavers-solid-doors.zip` and `module.json`. Foundry picks the update up through the manifest
+URL. The version in `package.json` does not need to be raised by hand; the release sets it.
