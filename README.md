@@ -40,6 +40,21 @@ simply free.
 - A door without a texture still works, it just has no picture.
 - The leaf is not tested against other walls, a door can swing through a wall.
 
+## API
+
+For other modules and macros, `game.modules.get("beavers-solid-doors").api`:
+
+- `solidConfig(wall)`: how a WallDocument moves, `{kind, direction, double, max, amount}`, or `undefined` for a door
+  that is no solid door. Works without a canvas.
+- `requestDoor(wall, open, amount?)`: open (to `amount`, default the stored one) or close the door, with the same rules
+  and GM routing as clicking its icon. Resolves to `{error?}`.
+- `leafSegments(c, config, amount)` and `amountToward(c, config, pointer, grab)`: the pure geometry. Any frame works
+  that is the scene turned, moved or scaled (not mirrored); segments come back rounded to whole units.
+- `CLOSE_BELOW`: an opening dragged below this closes the door.
+
+[Beaver's Mobile Pawn](https://github.com/AngryBeaver/beavers-mobile-pawn) uses it to let players drag doors open from
+their phone.
+
 ## Development
 
 ```
