@@ -11,6 +11,23 @@ A Foundry VTT v14 module where doors really move when they open.
   where you let go, so it can stand open only a crack. Drag it back to (almost) closed and it closes.
 - The door picture (if the door has a texture) moves by exactly the same amount.
 
+## Example
+|description|image|
+|---|---|
+| floor with purple light and floor with yellow light. Seperated by a door | <img width="363" height="362" alt="image" src="https://github.com/user-attachments/assets/0e06c5f7-158e-4c21-af0e-0adbd4ad9e14" /> |
+| when the solid door is open it blocks light and movement towards the yellow floor | <img width="408" height="381" alt="image" src="https://github.com/user-attachments/assets/9683adb2-d201-4316-9118-bb9e3fee6874" /> |
+| solid doors can be opened partialy and persist there | <img width="401" height="388" alt="image" src="https://github.com/user-attachments/assets/f617cd05-38ab-4616-bcc7-9b4167bb49ad" />|
+| solid doors can be used to peek into the next room | <img width="399" height="385" alt="image" src="https://github.com/user-attachments/assets/4bbe3405-08b6-48e3-aac7-3e5456ff4835" />|
+
+## Hot to set it up
+To set it up you do the same steps as you would for vtt-foundry core functionality animated doors.
+- click a door select an animation Type (Swing, Swivel and Slide can be made solid).
+- select one of vtt-foundries door textures (canvas/doors/...)
+- done
+- optionally you can finetune the open up degree.
+
+<img width="447" height="770" alt="image" src="https://github.com/user-attachments/assets/37719bf3-feb8-44c3-9174-0fde2f811bab" />
+
 ## Which doors are solid
 
 Every door animated with Foundry's **Swing**, **Swivel** or **Slide** is solid while the module is active; nothing to
