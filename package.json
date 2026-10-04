@@ -1,8 +1,8 @@
 {
   "name": "beavers-solid-doors",
   "title": "Beaver's Solid Doors",
-  "version": "0.1.0",
-  "description": "Doors that really swing: an open door is a wall turned around its hinge, it blocks where it stands. Drag a door to open it just a crack.",
+  "version": "1.0.1",
+  "description": "Doors that do move the wall when opening instead of just removing the wall. Solid doors can also be opened partially and persist there.",
   "devDir": "c:\\vtts\\v14.368\\Data\\modules",
   "type": "module",
   "main": "src/main.ts",
