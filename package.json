@@ -1,7 +1,7 @@
 {
   "name": "beavers-solid-doors",
   "title": "Beaver's Solid Doors",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Doors that do move the wall when opening instead of just removing the wall. Solid doors can also be opened partially and persist there.",
   "devDir": "c:\\vtts\\v14.368\\Data\\modules",
   "type": "module",
