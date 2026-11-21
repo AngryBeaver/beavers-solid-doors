@@ -6,6 +6,7 @@ import {
   iconPoint,
   latestAmount,
   leafSegments,
+  letsThrough,
   readConfig,
   rotate,
   sightPoints,
@@ -249,5 +250,22 @@ describe("iconPoint", () => {
     expect(iconPoint(C, door("slide", 1, 100), 50, true)).toEqual(at(0, 0));
     expect(iconPoint(C, door("slide", 1, 100), 100, true)).toEqual(at(0, 0));
     expect(iconPoint(C, door("slide", -1, 100), 80, true)).toEqual(at(100, 0));
+  });
+});
+
+describe("letsThrough", () => {
+  it("lets tokens through a door open more than the given share of its maximum", () => {
+    expect(letsThrough(4, 90, 5)).toBe(false); // 4.4 %
+    expect(letsThrough(5, 90, 5)).toBe(true); // 5.6 %
+    expect(letsThrough(5, 100, 5)).toBe(false); // exactly 5 %: not more
+    expect(letsThrough(6, 100, 5)).toBe(true);
+    expect(letsThrough(90, 90, 100)).toBe(false);
+  });
+  it("lets tokens through any open door at 0 %", () => {
+    expect(letsThrough(3, 180, 0)).toBe(true);
+  });
+  it("never for broken input", () => {
+    expect(letsThrough(NaN, 90, 5)).toBe(false);
+    expect(letsThrough(50, 0, 5)).toBe(false);
   });
 });

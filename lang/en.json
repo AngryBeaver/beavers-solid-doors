@@ -18,6 +18,16 @@
         "maxHint": "How far the door slides at most. 100 frees the whole doorway."
       }
     },
+    "settings": {
+      "passable": {
+        "name": "Open doors let tokens through",
+        "hint": "A solid door opened far enough (see below) no longer blocks movement: tokens can walk through the doorway and the door itself. The door still blocks sight, light and sound where it stands. Off, an open door blocks movement like a closed wall where it stands."
+      },
+      "passableAbove": {
+        "name": "Passable above (% of the maximum opening)",
+        "hint": "How far a door must be open before tokens can pass, in percent of its \"Opens up to\". 5 means a door that is open just a crack (more than 5 %) can already be walked through; 0 means any open door."
+      }
+    },
     "error": {
       "locked": "This door is locked.",
       "not-allowed": "You may not open or close doors.",

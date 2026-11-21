@@ -2,11 +2,13 @@ import {
   kindOf,
   latestAmount,
   leafSegments,
+  letsThrough,
   MODULE_ID,
   readConfig,
   type DoorConfig,
   type Segment,
 } from "./core/door.js";
+import { passableSettings } from "./settings.js";
 import { userAmounts } from "./stored.js";
 
 /**
@@ -59,8 +61,15 @@ export function drawLeaf(wall: any) {
   }
 }
 
-function createEdge(wall: any, id: string, [x0, y0, x1, y1]: Segment): any {
-  const { threshold, dir: direction, light, sight, sound, move } = wall;
+/** Whether an open door is open far enough that its leaf lets tokens through (see settings.ts). */
+function passable(config: DoorConfig): boolean {
+  const { enabled, above } = passableSettings();
+  return enabled && letsThrough(config.amount, config.max, above);
+}
+
+function createEdge(wall: any, id: string, [x0, y0, x1, y1]: Segment, passThrough: boolean): any {
+  const { threshold, dir: direction, light, sight, sound } = wall;
+  const move = passThrough ? (CONST.WALL_MOVEMENT_TYPES?.NONE ?? 0) : wall.move;
   // darkness is a getter mirroring light on the v14 document, fall back to light in case it is missing
   const darkness = wall.darkness ?? light;
   const dpx = wall.parent.dimensions.distancePixels;
@@ -93,7 +102,10 @@ function createEdge(wall: any, id: string, [x0, y0, x1, y1]: Segment): any {
 function createLeaves(wall: any): any[] {
   const config = solidConfig(wall);
   if (!config || wall.ds !== CONST.WALL_DOOR_STATES.OPEN) return [];
-  return leafSegments(wall.c, config, config.amount).map((segment, i) => createEdge(wall, leafId(wall, i), segment));
+  const passThrough = passable(config);
+  return leafSegments(wall.c, config, config.amount).map((segment, i) =>
+    createEdge(wall, leafId(wall, i), segment, passThrough),
+  );
 }
 
 /** Put the leaf edges of this wall where they belong now, or remove them. Refreshes what the change affects. */
@@ -121,6 +133,20 @@ export function syncLeaf(wall: any, deleted = false) {
   drawLeaf(wall);
   // The icon rides on an open single door (DoorControl#reposition is patched in interaction.ts)
   wall.object?.doorControl?.reposition();
+}
+
+/** Rebuild the leaves of every solid door in every scene, e.g. after a setting changed. */
+export function syncAllLeaves() {
+  for (const scene of game.scenes ?? []) {
+    for (const wall of scene.walls ?? []) {
+      if (!solidConfig(wall)) continue;
+      try {
+        syncLeaf(wall);
+      } catch (e) {
+        console.error(`${MODULE_ID} | could not place the leaf of door ${wall.id}`, e);
+      }
+    }
+  }
 }
 
 /** Every change to a wall's edge goes through WallDocument#initializeEdge: scene setup, create, update, delete. */

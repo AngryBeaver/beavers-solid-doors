@@ -47,6 +47,15 @@ switch on. The door moves the way Foundry's animation moves its picture:
 Doors without animation, with Ascend or Descend, and secret doors stay plain Foundry doors: open, the doorway is
 simply free.
 
+## Settings
+
+- **Open doors let tokens through** (world, on by default): a solid door opened more than the percentage below no
+  longer blocks movement, tokens can pass the doorway and the door itself. It still blocks sight, light and sound
+  where it stands, so a door left ajar can be slipped through but not seen through. Off, the open door blocks
+  movement like the closed wall did.
+- **Passable above** (default 5 %): how far a door must be open, in percent of its "Opens up to", before tokens can
+  pass. 0 means any open door.
+
 ## Notes
 
 - Players may only open and close doors, not change a wall. A new opening goes to the GM's client, which stores it

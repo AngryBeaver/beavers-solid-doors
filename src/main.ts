@@ -1,8 +1,9 @@
 import { amountToward, CLOSE_BELOW, leafSegments, MODULE_ID } from "./core/door.js";
 import { moveToAmount, patchAnimations, reinitializePicture } from "./animation.js";
 import { patchDoorControl } from "./interaction.js";
-import { drawLeaf, patchInitializeEdge, solidConfig, syncLeaf } from "./leaf.js";
+import { drawLeaf, patchInitializeEdge, solidConfig, syncAllLeaves, syncLeaf } from "./leaf.js";
 import { registerQuery, requestDoor } from "./request.js";
+import { registerSettings } from "./settings.js";
 import { adoptUserAmounts, wallsChangedIn } from "./stored.js";
 import { registerWallConfig } from "./wallConfig.js";
 
@@ -19,6 +20,7 @@ import { registerWallConfig } from "./wallConfig.js";
 const api = { solidConfig, requestDoor, leafSegments, amountToward, CLOSE_BELOW };
 
 Hooks.once("init", () => {
+  registerSettings(syncAllLeaves);
   patchInitializeEdge();
   patchAnimations();
   registerQuery();

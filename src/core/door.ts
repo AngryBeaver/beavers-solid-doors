@@ -114,6 +114,15 @@ export function readConfig(flags: unknown, kind: Kind, animation?: Animation | n
 }
 
 /**
+ * Whether a door open by `amount` (of at most `max`) lets tokens through: open more than `above` percent of its
+ * maximum. Its leaf then no longer blocks movement, only sight, light and sound.
+ */
+export function letsThrough(amount: number, max: number, above: number): boolean {
+  if (!(max > 0) || !finite(amount)) return false;
+  return (amount / max) * 100 > above;
+}
+
+/**
  * One moving part of a door, as Foundry draws it: from its root (the end at the wall's endpoint) to its tip.
  * A single door is one part from A to B. A double door is two halves, from A and from B to the middle; the second
  * turns the other way (sign -1), so both open to the same side.
